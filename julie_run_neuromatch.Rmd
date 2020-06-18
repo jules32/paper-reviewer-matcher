@@ -1,0 +1,107 @@
+---
+title: "Run neuromatch"
+author: "Julie Lowndes"
+date: "6/18/2020"
+output: html_document
+---
+
+
+
+## Option 2: Command Line
+Following advice from [mindmatch readme](https://github.com/jules32/paper-reviewer-matcher#mind-match-command-line), installing and troubleshooting [dependencies](https://github.com/jules32/paper-reviewer-matcher#dependencies) first
+
+```{bash}
+
+pip install protobuf==3.0.0b4
+pip install ortools
+pip install unidecode
+pip install -r requirements.txt 
+python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
+
+```
+
+## The output looks like this: 
+
+## What do we do with this output
+i.e. we now need to send 200 emails, how to automate? With `gmailr`: see [Jenny Bryan's how-to](https://github.com/jennybc/send-email-with-r).
+
+
+# Python Troubleshooting 
+
+The above worked from the command line, after unsuccessfully running from RStudio/reticulate
+
+## From the command line
+
+
+**Error (just 1, not 3) fixed with `pip install unidecode`**: 
+Traceback (most recent call last):
+  File "mindmatch.py", line 31, in <module>
+    from paper_reviewer_matcher import preprocess, affinity_computation, \
+  File "/Users/jlowndes/github/paper-reviewer-matcher/paper_reviewer_matcher/__init__.py", line 2, in <module>
+    from .preprocess import preprocess
+  File "/Users/jlowndes/github/paper-reviewer-matcher/paper_reviewer_matcher/preprocess.py", line 3, in <module>
+    from unidecode import unidecode
+ModuleNotFoundError: No module named 'unidecode'
+
+Started at 15:17.
+Progress at 15:27:
+
+```
+ jlowndes@CZIRWC1MACOSX1016 paper-reviewer-matcher % python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
+using scipy for linear programming optimization
+/Users/jlowndes/opt/anaconda3/lib/python3.7/site-packages/fuzzywuzzy/fuzz.py:11: UserWarning: Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning
+  warnings.warn('Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning')
+Number of people in the file = 1162
+Number of match is set to 6
+Trimming parameter is set to 50
+Compute conflicts... (this may take a bit)
+1162it [07:55,  2.44it/s]
+Done computing conflicts!
+Solving a matching problem...
+```
+
+
+## Reticulate. 
+
+Unfortunately I couldn't figure out how to get requirements.txt loaded into the environment
+
+```{r setup}
+
+## load R libraries
+library(reticulate) #install.packages("reticulate")
+
+## check reticulate and python
+use_python("/usr/local/bin/python")
+Sys.which("python") # "/usr/bin/python" just checking
+
+
+## set up a python environment (https://rstudio.github.io/reticulate/articles/python_packages.html)
+# create a new environment 
+conda_create("r-reticulate")
+
+# install pandas
+conda_install("r-reticulate", "pandas")
+conda_install("r-reticulate", )
+
+# import SciPy (it will be automatically discovered in "r-reticulate")
+pandas <- import("pandas")
+
+
+## Notes
+## install pandas for the first time
+# py_install("pandas")
+
+```
+
+```{bash}
+
+python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
+
+## Currently this errors:
+#Traceback (most recent call last):
+ # File "mindmatch.py", line 27, in <module>
+  #  import pandas as pd
+#ImportError: No module named pandas
+
+```
+

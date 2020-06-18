@@ -1,0 +1,67 @@
+---
+title: "Exploring using neuromatch for smaller conferences"
+author: "Julie Lowndes"
+date: "6/18/2020"
+output: html_document
+---
+
+## Context
+
+We have a ~230 person virtual conference coming up, and are exploring if **Neuromatch** can create meaningful connections for participants. Neuromatch is developed by Titipat Achakulvisut and folks form Konrad Kording's lab at UPenn and uses machine-learning to help match scientists based on abstracts they have online research conferences.
+
+Here I'm determining whether this will be a good fit for us by exploring: 
+
+1. If I can run their code from GitHub 
+1. What the output looks like and what we would do from there
+1. If the code runs with fewer participants
+1. If other text statements would work for folks that don't submit abstracts
+1. Other issues/ideas that emerge.
+
+A note in regards to Item 1 above: This is my first experience with machine learning. Additionally, I am exploring neuromatch while also learning Python(!), so there will be some details to that effect. I am a confident R user, and was hoping to run everything from R, through coding in R and using the `reticulate` package to run Python. However, with my limited knowledge of python environments, I have had more success running python code from The Command Line. 
+
+This document describes the whole exploratory workflow, whether the code was run from R or from the Command Line.
+
+
+Start exploring based on this command: 
+`python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50`
+
+The arguments mean the following: 
+
+- `n_match=6` means it will return 6 matches per user
+- `n_trim=50` is the "trimming parameter for distance matrix, increase to reduce problem size". 
+
+
+```{r setup}
+
+## load libraries
+library(tidyverse) # install.packages('tidyverse')
+
+## read in data
+data_raw <- readr::read_csv("data/mindmatch_example.csv")
+
+```
+
+```{r explore}
+
+## explore columns
+names(data_raw)
+head(data_raw)
+
+## create smaller datasets
+data_small <- sample_n(data_raw, 230)
+data_small_noconflicts <- data_small %>%
+  select(-conflicts)
+
+write_csv(data_small, "data/mindmatch_small.csv")
+
+```
+
+
+Now we'll run this smaller dataset twice, first to see if neuromatch works with this number of people and second 
+```{bash}
+
+
+python mindmatch.py data/mindmatch_small.csv --n_match=6 --n_trim=50
+```
+
+
