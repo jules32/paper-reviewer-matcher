@@ -105,6 +105,9 @@ This is next to be completed!! I'll run:
 python mindmatch.py data/smallmatch_example_noconflicts.csv --n_match=6 --n_trim=50  --output=smallmatch_output_noconflicts.csv
 ```
 
+## Running neuromatch with abstract substitutes
+
+To complete!
 
 
 ## Python setup notes
