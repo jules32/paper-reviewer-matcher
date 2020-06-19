@@ -5,9 +5,9 @@ date: "6/18/2020"
 output: html_document
 ---
 
-## Context
+## Background
 
-We have a ~230 person virtual conference coming up, and are exploring if **Neuromatch** can create meaningful connections for participants. Neuromatch is developed by Titipat Achakulvisut and folks form Konrad Kording's lab at UPenn and uses machine-learning to help match scientists based on abstracts they have online research conferences.
+We have a ~230 person virtual conference coming up, and are exploring if **Neuromatch** can create meaningful connections for participants. Neuromatch is developed by Titipat Achakulvisut and folks from Konrad [Kording's lab](https://twitter.com/KordingLab) at UPenn and uses machine-learning to help match scientists based on abstracts they have online research conferences. They are sharing their work openly on [GitHub/titipata](https://github.com/titipata/paper-reviewer-matcher) and have written several very informative articles about neuromatches' functionality and use, including the [neuromatch.io website](https://neuromatch.io/), the eLife articles [neuromatch: Algorithms to match scientists](https://elifesciences.org/labs/5ed408f4/neuromatch-algorithms-to-match-scientists) and [Point of View: Improving on legacy conferences by moving online](https://elifesciences.org/articles/57892). 
 
 Here I'm determining whether this will be a good fit for us by exploring: 
 
@@ -17,21 +17,46 @@ Here I'm determining whether this will be a good fit for us by exploring:
 1. If other text statements would work for folks that don't submit abstracts
 1. Other issues/ideas that emerge.
 
-A note in regards to Item 1 above: This is my first experience with machine learning. Additionally, I am exploring neuromatch while also learning Python(!), so there will be some details to that effect. I am a confident R user, and was hoping to run everything from R, through coding in R and using the `reticulate` package to run Python. However, with my limited knowledge of python environments, I have had more success running python code from The Command Line. 
+A note in regards to Item 1 above: This is my first experience with machine learning. Additionally, I am exploring neuromatch while also learning Python(!), and expect I will have issues understanding and Running Other People's Code. I am a confident R coder, and was hoping to run everything from R, through coding in R and using the `reticulate` package to run Python. However, with my limited knowledge of python environments, I have had more success running python code from The Command Line. 
 
 This document describes the whole exploratory workflow, whether the code was run from R or from the Command Line.
 
+## Neuromatch Setup
 
 Start exploring based on this command: 
 `python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50`
 
-The arguments mean the following: 
+This is run from the Command Line, with `mindmatch.py` operating on data stored in a .csv with 2 additional arguments.
+
+Looking at [mindmatch.py](https://github.com/titipata/paper-reviewer-matcher/blob/master/mindmatch.py) the arguments mean the following: 
 
 - `n_match=6` means it will return 6 matches per user
 - `n_trim=50` is the "trimming parameter for distance matrix, increase to reduce problem size". 
 
+An additional argument: `output=<output>` will let us output a csv file that contains 'user_id' and 'match_ids' which has match ids. That will be useful for us later on! Looking at the example output file [output_match.csv](https://github.com/titipata/paper-reviewer-matcher/blob/master/data/output_match.csv) the output returned will be two columns: `user_id` and `match_id`. 
 
-```{r setup}
+## Running neuromatch example code
+
+I started by getting the example code to run. The code is written in Python, so I first needed to figure out the setup (see [python setup notes]()). I ended up running this code from the Command Line instead of from R/RStudio.
+
+Following advice from the Command Line part of the [Mind-Match README](https://github.com/jules32/paper-reviewer-matcher#mind-match-command-line) and troubleshooting through the install [dependencies](https://github.com/jules32/paper-reviewer-matcher#dependencies), this is the order of the code that successfully ran. 
+
+```
+pip install protobuf==3.0.0b4
+pip install ortools
+pip install unidecode
+pip install -r requirements.txt 
+python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
+
+```
+
+This will take an hour or more to run. During this time, I started to explore the data, which is the next section below. But I am interested to see the what the output looks like so we can start thinking about what we would do with that output, i.e. emailing ~200 people identifying their match and suggesting they contact each other. It sounds like the perfect job for [gmailr](https://github.com/jennybc/send-email-with-r#how-to-send-a-bunch-of-emails-from-r).
+
+## Exploring the data
+
+While it's running, let's have a look at the data. For me, R is the tool for the job. I'll load the `tidyverse` library and data and have a quick look:
+
+```{r setup, message=FALSE, warning=FALSE, results='hide'}
 
 ## load libraries
 library(tidyverse) # install.packages('tidyverse')
@@ -39,29 +64,103 @@ library(tidyverse) # install.packages('tidyverse')
 ## read in data
 data_raw <- readr::read_csv("data/mindmatch_example.csv")
 
-```
-
-```{r explore}
-
-## explore columns
+## explore data
 names(data_raw)
 head(data_raw)
+
+```
+
+There are `r nrow(data_raw)` columns, which are: `r names(data_raw)`. 
+
+We'll create 2 test dataframes to test. Both will be smaller (around the size of our conference) and the second will not have the "conflicts" column to see if the code will still run without that parameter. We'll write them both to new csv files.
+
+```{r explore}
 
 ## create smaller datasets
 data_small <- sample_n(data_raw, 230)
 data_small_noconflicts <- data_small %>%
   select(-conflicts)
 
-write_csv(data_small, "data/mindmatch_small.csv")
+write_csv(data_small, "data/smallmatch_example.csv")
+write_csv(data_small_noconflicts, "data/smallmatch_example_noconflicts.csv")
 
 ```
+
+
 
 
 Now we'll run this smaller dataset twice, first to see if neuromatch works with this number of people and second 
-```{bash}
 
-
-python mindmatch.py data/mindmatch_small.csv --n_match=6 --n_trim=50
 ```
+python mindmatch.py data/mindmatch_small.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv
+```
+
+
+## Python setup notes
+
+The above worked from the command line, after unsuccessfully running from RStudio/reticulate. These are just some notes to myself about what I tried to get the python code running.
+
+### From the Command Line
+
+
+**Error (just 1, not 3) fixed with `pip install unidecode`**: 
+Traceback (most recent call last):
+  File "mindmatch.py", line 31, in <module>
+    from paper_reviewer_matcher import preprocess, affinity_computation, \
+  File "/Users/jlowndes/github/paper-reviewer-matcher/paper_reviewer_matcher/__init__.py", line 2, in <module>
+    from .preprocess import preprocess
+  File "/Users/jlowndes/github/paper-reviewer-matcher/paper_reviewer_matcher/preprocess.py", line 3, in <module>
+    from unidecode import unidecode
+ModuleNotFoundError: No module named 'unidecode'
+
+Started at 15:17.
+Progress at 15:27:
+
+```
+ jlowndes@CZIRWC1MACOSX1016 paper-reviewer-matcher % python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
+using scipy for linear programming optimization
+/Users/jlowndes/opt/anaconda3/lib/python3.7/site-packages/fuzzywuzzy/fuzz.py:11: UserWarning: Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning
+  warnings.warn('Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning')
+Number of people in the file = 1162
+Number of match is set to 6
+Trimming parameter is set to 50
+Compute conflicts... (this may take a bit)
+1162it [07:55,  2.44it/s]
+Done computing conflicts!
+Solving a matching problem...
+```
+
+
+### Reticulate
+The reticulate article [Installing Python Packages](https://rstudio.github.io/reticulate/articles/python_packages.html#overview-1) was super helpful, but unfortunately I couldn't figure out how to get requirements.txt loaded into the environment so I had to give up and go to the Command Line option.
+
+```{r setup-reticulate, eval=FALSE}
+
+## load R libraries
+library(reticulate) #install.packages("reticulate")
+
+## check reticulate and python
+use_python("/usr/local/bin/python")
+Sys.which("python") # "/usr/bin/python" just checking
+
+
+## set up a python environment (https://rstudio.github.io/reticulate/articles/python_packages.html)
+# create a new environment 
+conda_create("r-reticulate")
+
+# install pandas
+conda_install("r-reticulate", "pandas")
+conda_install("r-reticulate", )
+
+# import SciPy (it will be automatically discovered in "r-reticulate")
+pandas <- import("pandas")
+
+
+## Notes
+## install pandas for the first time
+# py_install("pandas")
+
+```
+
 
 
