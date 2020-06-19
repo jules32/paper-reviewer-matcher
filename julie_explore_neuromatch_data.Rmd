@@ -12,7 +12,6 @@ We have a ~230 person virtual conference coming up, and are exploring if **Neuro
 Here I am trying to determine whether this will be a good fit for us by exploring:  
 
 1. If I can run their code from GitHub 
-1. What the output looks like and what we would do from there
 1. If the code runs with fewer participants
 1. If other text statements would work for folks that don't submit abstracts
 1. Other issues/ideas that emerge.
@@ -86,14 +85,26 @@ write_csv(data_small_noconflicts, "data/smallmatch_example_noconflicts.csv")
 
 ```
 
+## Running neuromatch with smaller data
 
+Now we'll run this smaller dataset twice, first to see if neuromatch works with this number of people.
 
-
-Now we'll run this smaller dataset twice, first to see if neuromatch works with this number of people and second 
+This is next to be completed!! I'll run:
 
 ```
-python mindmatch.py data/mindmatch_small.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv
+python mindmatch.py data/smallmatch_example.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv
 ```
+
+## Running neuromatch with smaller data and no conflicts
+
+Now we'll see if neuromatch works with this number of people and without that `conflicts` column in case we don't have that data. 
+
+This is next to be completed!! I'll run:
+
+```
+python mindmatch.py data/smallmatch_example_noconflicts.csv --n_match=6 --n_trim=50  --output=smallmatch_output_noconflicts.csv
+```
+
 
 
 ## Python setup notes

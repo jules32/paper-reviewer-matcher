@@ -375,7 +375,6 @@ summary {
 <p>Here I am trying to determine whether this will be a good fit for us by exploring:</p>
 <ol style="list-style-type: decimal">
 <li>If I can run their code from GitHub</li>
-<li>What the output looks like and what we would do from there</li>
 <li>If the code runs with fewer participants</li>
 <li>If other text statements would work for folks that don’t submit abstracts</li>
 <li>Other issues/ideas that emerge.</li>
@@ -427,8 +426,18 @@ data_small_noconflicts &lt;- data_small %&gt;%
 
 write_csv(data_small, &quot;data/smallmatch_example.csv&quot;)
 write_csv(data_small_noconflicts, &quot;data/smallmatch_example_noconflicts.csv&quot;)</code></pre>
-<p>Now we’ll run this smaller dataset twice, first to see if neuromatch works with this number of people and second</p>
-<pre><code>python mindmatch.py data/mindmatch_small.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv</code></pre>
+</div>
+<div id="running-neuromatch-with-smaller-data" class="section level2">
+<h2>Running neuromatch with smaller data</h2>
+<p>Now we’ll run this smaller dataset twice, first to see if neuromatch works with this number of people.</p>
+<p>This is next to be completed!! I’ll run:</p>
+<pre><code>python mindmatch.py data/smallmatch_example.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv</code></pre>
+</div>
+<div id="running-neuromatch-with-smaller-data-and-no-conflicts" class="section level2">
+<h2>Running neuromatch with smaller data and no conflicts</h2>
+<p>Now we’ll see if neuromatch works with this number of people and without that <code>conflicts</code> column in case we don’t have that data.</p>
+<p>This is next to be completed!! I’ll run:</p>
+<pre><code>python mindmatch.py data/smallmatch_example_noconflicts.csv --n_match=6 --n_trim=50  --output=smallmatch_output_noconflicts.csv</code></pre>
 </div>
 <div id="python-setup-notes" class="section level2">
 <h2>Python setup notes</h2>
