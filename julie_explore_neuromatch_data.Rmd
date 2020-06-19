@@ -9,7 +9,7 @@ output: html_document
 
 We have a ~230 person virtual conference coming up, and are exploring if **Neuromatch** can create meaningful connections for participants. Neuromatch is developed by Titipat Achakulvisut and folks from Konrad [Kording's lab](https://twitter.com/KordingLab) at UPenn and uses machine-learning to help match scientists based on abstracts they have online research conferences. They are sharing their work openly on [GitHub/titipata](https://github.com/titipata/paper-reviewer-matcher) and have written several very informative articles about neuromatches' functionality and use, including the [neuromatch.io website](https://neuromatch.io/), the eLife articles [neuromatch: Algorithms to match scientists](https://elifesciences.org/labs/5ed408f4/neuromatch-algorithms-to-match-scientists) and [Point of View: Improving on legacy conferences by moving online](https://elifesciences.org/articles/57892). 
 
-Here I'm determining whether this will be a good fit for us by exploring: 
+Here I am trying to determine whether this will be a good fit for us by exploring:  
 
 1. If I can run their code from GitHub 
 1. What the output looks like and what we would do from there
