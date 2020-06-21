@@ -5,6 +5,8 @@ date: "6/18/2020"
 output: html_document
 ---
 
+***Note**: I was not able to successfully run the example code with >1100 rows (it hung) nor a subset of 230 rows (it seemed to not be enough data for the algorithm). Thus, I am no longer exploring this for our conference in July.*
+
 ## Background
 
 We have a ~230 person virtual conference coming up, and are exploring if **Neuromatch** can create meaningful connections for participants. Neuromatch is developed by Titipat Achakulvisut and folks from Konrad [Kording's lab](https://twitter.com/KordingLab) at UPenn and uses machine-learning to help match scientists based on abstracts they have online research conferences. They are sharing their work openly on [GitHub/titipata](https://github.com/titipata/paper-reviewer-matcher) and have written several very informative articles about neuromatches' functionality and use, including the [neuromatch.io website](https://neuromatch.io/), the eLife articles [neuromatch: Algorithms to match scientists](https://elifesciences.org/labs/5ed408f4/neuromatch-algorithms-to-match-scientists) and [Point of View: Improving on legacy conferences by moving online](https://elifesciences.org/articles/57892). 
@@ -51,6 +53,8 @@ python mindmatch.py data/mindmatch_example.csv --n_match=6 --n_trim=50
 
 This will take an hour or more to run. During this time, I started to explore the data, which is the next section below. But I am interested to see the what the output looks like so we can start thinking about what we would do with that output, i.e. emailing ~200 people identifying their match and suggesting they contact each other. It sounds like the perfect job for [gmailr](https://github.com/jennybc/send-email-with-r#how-to-send-a-bunch-of-emails-from-r).
 
+The above actually did not run properly; I let it go overnight and then killed it after 15 hours. We'll make reduce the data size
+
 ## Exploring the data
 
 While it's running, let's have a look at the data. For me, R is the tool for the job. I'll load the `tidyverse` library and data and have a quick look:
@@ -76,7 +80,7 @@ We'll create 2 test dataframes to test. Both will be smaller (around the size of
 ```{r explore}
 
 ## create smaller datasets
-data_small <- sample_n(data_raw, 230)
+data_small <- head(data_raw, 230) # sample_n(data_raw, 230) # let's keep it constant
 data_small_noconflicts <- data_small %>%
   select(-conflicts)
 
@@ -91,9 +95,76 @@ Now we'll run this smaller dataset twice, first to see if neuromatch works with 
 
 This is next to be completed!! I'll run:
 
+Starting at 09:55 Friday
+
 ```
+pip install -r requirements.txt 
+
 python mindmatch.py data/smallmatch_example.csv --n_match=6 --n_trim=50  --output=smallmatch_output.csv
 ```
+
+**Errored:** (checked at 11:40)
+
+```
+Number of people in the file = 230
+Number of match is set to 6
+Trimming parameter is set to 50
+Compute conflicts... (this may take a bit)
+230it [00:18, 12.47it/s]
+mindmatch.py:138: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  A[cois] = -1000
+Traceback (most recent call last):
+  File "mindmatch.py", line 138, in <module>
+    A[cois] = -1000
+IndexError: too many indices for array
+```
+
+Now try: 
+Starting at 11:40 Friday
+
+```
+
+python mindmatch.py data/smallmatch_example.csv --n_match=3 --n_trim=50  --output=smallmatch_output.csv
+```
+
+**Errored immediately, 11:41am**
+
+```
+Number of people in the file = 230
+Number of match is set to 3
+Trimming parameter is set to 50
+Compute conflicts... (this may take a bit)
+230it [00:18, 12.30it/s]
+mindmatch.py:138: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+  A[cois] = -1000
+Traceback (most recent call last):
+  File "mindmatch.py", line 138, in <module>
+    A[cois] = -1000
+IndexError: too many indices for array
+```
+
+Now try: 
+Starting at 11:42 Friday
+
+```
+python mindmatch.py data/smallmatch_example.csv --n_match=3 --n_trim=100  --output=smallmatch_output.csv
+```
+
+
+**Also errored immediately**.
+
+Trying: 
+```
+python mindmatch.py data/smallmatch_example.csv --n_match=3 --n_trim=150  --output=smallmatch_output.csv
+```
+
+**Also errored immediately**.
+
+Trying: 
+```
+python mindmatch.py data/smallmatch_example.csv --n_match=3 --n_trim=25  --output=smallmatch_output.csv
+```
+
 
 ## Running neuromatch with smaller data and no conflicts
 
